@@ -1,5 +1,5 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-local WebHook = 'https://discord.com/api/webhooks/1059495313095794688/UXscqumwwNq2fg7P8nK_QpuM4E1qIZ-vft_UqwHQNv1_df6ybr3_ItpR1DjIV97jYVhY'
+local WebHook = 'WebHook'
 
 function SendDiscordMessage(item, Payment, pocet, Player)
 	local citizenid = Player.PlayerData.citizenid
