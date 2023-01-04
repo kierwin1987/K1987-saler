@@ -2,8 +2,8 @@ fx_version 'cerulean'
 game 'gta5'
 
 description 'QB-Saler'
-version '1.1.0'
-author 'Kierwin1987'
+version '1.0.0'
+author 'Kierwin1987' --https://github.com/kierwin1987/qb-saler
 
 shared_scripts {
     '@qb-core/shared/locale.lua',
@@ -27,3 +27,5 @@ dependencies {
 }
 
 lua54 'yes'
+dependency 'qb-core'
+dependency 'qb-target'
