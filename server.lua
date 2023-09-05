@@ -1,31 +1,34 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-local WebHook = 'WebHook'
 
-function SendDiscordMessage(item, Payment, pocet, Player)
-	local citizenid = Player.PlayerData.citizenid
-	local name = Player.PlayerData.name
-	local footer = "qb-saler"
-	local color = 56108
-	local message = name.." ["..citizenid.."] prodal "..pocet.amount.."x "..item['label'].." za $"..Payment
-	local embeds = {
-		{
-			["title"] = name,
-			["description"] = message,
-			["type"] = "rich",
-			["color"] = color,
-			["footer"] = {
-				["text"] = footer,
-			},
-		}
-	}
+QBCore.Functions.CreateCallback('qb-saler:server:GetCurrentPlayers', function(source, cb)
+    local TotalPlayers = 0
+    for k, v in pairs(QBCore.Functions.GetPlayers()) do
+        TotalPlayers = TotalPlayers + 1
+    end
+    cb(TotalPlayers)
+end)
 
-    PerformHttpRequest(WebHook, function(err, text, headers) end, 'POST', json.encode({ username = name, embeds = embeds }), { ['Content-Type'] = 'application/json' })
-end
+QBCore.Functions.CreateCallback('qb-saler:server:GetActivity', function(source, cb)
+    local PoliceCount = 0
+    local AmbulanceCount = 0
+    for k, v in pairs(QBCore.Functions.GetQBPlayers()) do
+        if v.PlayerData.job.name == "police" and v.PlayerData.job.onduty then
+            PoliceCount = PoliceCount + 1
+        end
 
-RegisterNetEvent('qb-saler:server:Selling', function(item, cena)
+        if v.PlayerData.job.name == "ambulance" and v.PlayerData.job.onduty then
+            AmbulanceCount = AmbulanceCount + 1
+        end
+    end
+    cb(PoliceCount, AmbulanceCount)
+end)
+
+RegisterNetEvent('qb-saler:server:Selling', function(item, cena, Ped)
 	local Player = QBCore.Functions.GetPlayer(source)
 	local pocet = Player.Functions.GetItemByName(item)
-
+	local amount = 0
+	local players = QBCore.Functions.GetQBPlayers()
+	print('test')
 	if Player.PlayerData.items ~= nil then
 		if item ~= nil and pocet ~= nil then
 			if pocet.amount > 0 then
@@ -35,15 +38,14 @@ RegisterNetEvent('qb-saler:server:Selling', function(item, cena)
 				TriggerClientEvent('inventory:client:ItemBox', source, item, "remove")
 				Player.Functions.AddMoney('cash', Payment)
 				TriggerClientEvent('QBCore:Notify', source, Lang:t('success.sold', {value = pocet.amount, value2 = item['label'], value3 = Payment}), "success")
-				SendDiscordMessage(item, Payment, pocet, Player)
 			else
 				TriggerClientEvent('QBCore:Notify', source, Lang:t("error.invalid_items"), 'error')
 			end
-
 		else
 			TriggerClientEvent('QBCore:Notify', source, Lang:t("error.invalid_items"), 'error')
 		end
 	else
 		TriggerClientEvent('QBCore:Notify', source, Lang:t("error.no_items"), "error")
 	end
+
 end)
