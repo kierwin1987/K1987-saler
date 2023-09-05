@@ -1,67 +1,61 @@
 Config = {}
 
-Config.UseTarget = GetConvar('UseTarget', 'true') == 'true'
+Config.UseTarget = GetConvar('UseTarget', 'false') == 'true'
 
 Config.Peds = {
 	["Prodej"] = {
 		["label"] = "Prodejce",
-		["coords"] = vector4(485.82, 4813.58, -58.38, 350.1),
+		["coords"] = vector4(-1211.98, -1546.65, 4.37, 314.84),
 		["ped"] = 'mp_m_shopkeep_01',
 		["scenario"] = "WORLD_HUMAN_STAND_MOBILE",
 		["radius"] = 1.5,
 		["targetIcon"] = "fas fa-shopping-basket",
 		["targetLabel"] = "Prodej nižší",
 		["akce"] = "prodej",
+		["need_cop"] = 0,
 		["gang"] = {
 			["lostmc"] = 0,
 			["ballas"] = 0,
 		},
-		["showblip"] = false,
-        ["blipsprite"] = 52,
-        ["blipscale"] = 0.6,
-        ["blipcolor"] = 0
-   },
-   ["Prodej2"] = {
+		["markedbills"] = true
+	},
+	["Prodej2"] = {
 		["label"] = "Prodejce 2",
-		["coords"] = vector4(481.27, 4814.25, -58.38, 22.36),
+		["coords"] = vector4(-1208.98, -1551.29, 4.37, 297.94),
 		["ped"] = 'mp_m_shopkeep_01',
 		["scenario"] = "WORLD_HUMAN_STAND_MOBILE",
 		["radius"] = 1.5,
 		["targetIcon"] = "fas fa-shopping-basket",
 		["targetLabel"] = "Prodej vyšší",
 		["akce"] = "prodej2",
+		["need_cop"] = 0,
 		["gang"] = {
+			["families"] = 0,
 			["vagos"] = 0,
-			["triads"] = 0,
 		},
-		["showblip"] = false,
-        ["blipsprite"] = 52,
-        ["blipscale"] = 0.6,
-        ["blipcolor"] = 0
+		["markedbills"] = true
 	},
 	["Prodej3"] = {
-		["label"] = "<font face='Red Hat Display'>Prodejce</font>",
-		["coords"] = vector4(479.88, 4818.33, -58.38, 13.5),
-		["ped"] = 'cs_priest',
-		["scenario"] = "WORLD_HUMAN_STAND_MOBILE",
+		["label"] = "Prodejce 3",
+		["coords"] = vector4(-1208.97, -1543.64, 4.33, 197.45),
+		["ped"] = 'csb_mp_agent14',
+		["scenario"] = "world_human_drinking",
 		["radius"] = 1.5,
 		["targetIcon"] = "fas fa-shopping-basket",
-		["targetLabel"] = "Prodej vše",
-		["akce"] = "prodej3",
+		["targetLabel"] = "Prodej vyšší",
+		["akce"] = "prodej2",
+		["need_cop"] = 2,
 		["gang"] = {
 			["none"] = 0,
 		},
-		["showblip"] = false,
-        ["blipsprite"] = 52,
-        ["blipscale"] = 0.6,
-        ["blipcolor"] = 0
-	}
+		["markedbills"] = true
+	},
 }
 
 Config.Targets = {}
 
 Config.Selling = {
-	Prodej = {
+	["prodej"] = {
 		[1] = {
 			ItemName = "beer",
 			Price = 50,
@@ -75,7 +69,7 @@ Config.Selling = {
 			description = "Prodej vodky"
 		}
 	},
-	Prodej2 = {
+	["prodej2"] = {
 		[1] = {
 			ItemName = "joint",
 			Price = 50,
@@ -89,18 +83,4 @@ Config.Selling = {
 			description = "Prodej crack"
 		}
 	},
-	Prodej3 = {
-		[1] = {
-			ItemName = "lockpick",
-			Price = 50,
-			Label = "Lockpick",
-			description = "Prodej Lockpick"
-		},
-		[2] = {
-			ItemName = "metalscrap",
-			Price = 60,
-			Label = "Šrot",
-			description = "Prodej Šrot"
-		}
-	}
 }
