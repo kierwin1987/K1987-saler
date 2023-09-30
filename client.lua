@@ -6,34 +6,38 @@ local pedSpawned = false
 local JobPed = {}
 
 local function deletePeds()
-	if pedSpawned then
-		for k, v in pairs(JobPed) do
-			DeletePed(v)
-		end
+	if not pedSpawned then return end
+
+	for k, v in pairs(JobPed) do
+		DeletePed(v)
 	end
+	pedSpawned = false
 end
 
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
-	PlayerJob = JobInfo
+	local PlayerJob = JobInfo
 end)
 
 local function createPeds()
 	if pedSpawned then return end
 	
-	QBCore.Functions.TriggerCallback('qb-saler:server:GetActivity', function(cops, ambulance)
-		QBCore.Functions.TriggerCallback("qb-saler:server:GetCurrentPlayers", function(Players)
+	QBCore.Functions.TriggerCallback('k1987-saler:server:GetActivity', function(cops, ambulance)
+		QBCore.Functions.TriggerCallback("k1987-saler:server:GetCurrentPlayers", function(Players)
 		end)
 	end)
 	
 	for k, v in pairs(Config.Peds) do
 		if not JobPed[k] then JobPed[k] = {} end
-		local SalerPed = k
+		local stableprice = v["StablePrice"]
 		local current = v["ped"]
 		local akce = v["akce"]
 		local gang = v["gang"]
 		local job = v["job"]
+		local illegal = v["illegal"]
 		local needed_cops = v["need_cop"]
-		current = type(current) == 'string' and GetHashKey(current) or current
+		local markedbills = v["markedbills"]
+		
+		local current = type(v["ped"]) == "number" and v["ped"] or joaat(v["ped"])
 		RequestModel(current)
 
 		while not HasModelLoaded(current) do
@@ -55,9 +59,8 @@ local function createPeds()
 				gang = gang,
 				job = job,
 				action = function() 
-					TriggerEvent('qb-saler:client:target:prodej', akce, SalerPed, needed_cops, cops)
- --					Menu(k, Config.Peds[k], akce)
-					end,
+					TriggerEvent('k1987-saler:client:target:prodej', akce, markedbills, needed_cops, cops, stableprice, illegal)
+ 					end,
 				}
 			},
 			distance = 2.0
@@ -73,21 +76,34 @@ local function createPeds()
 	pedSpawned = true
 end
 
-RegisterNetEvent('qb-saler:client:target:Sell', function (data)
+RegisterNetEvent('k1987-saler:client:target:Sell', function (data)
 	local item = data.item
-	local cena = data.cena
-	local Ped = data.SalerPed
-	TriggerServerEvent('qb-saler:server:Selling', item, cena, Ped)
+	local markedbills = data.markedbills
+	local stableprice = data.stableprice
+	local minprice = data.minprice
+	local maxprice = data.maxprice
+	local illegal = data.illegal
+	if stableprice then
+		cena = data.cena
+	else
+		cena = math.random(minprice, maxprice)
+	end
+	
+	if illegal then
+		for k,_ in pairs(Config.Dispatch) do
+			if k == "ps" and v then
+				exports['ps-dispatch']:DrugSale()
+			elseif k == "default" and v then
+				TriggerServerEvent('police:server:policeAlert', 'Probíhá prodej drog')
+			end
+		end
+	end
+	TriggerServerEvent('k1987-saler:server:Selling', item, cena, markedbills)
 end)
 
-RegisterNetEvent('qb-saler:client:target:prodej', function (akce, SalerPed, needed_cops, cops)
-	print(needed_cops)
-	print(cops)
-	print(cops>needed_cops)
-	
+RegisterNetEvent('k1987-saler:client:target:prodej', function (akce, markedbills, needed_cops, cops, stableprice, illegal)
 	if cops >= needed_cops then
-		QBCore.Functions.Notify('Nedostatek PD', "error", 5000)
-		print("Nedostatek PD")
+		QBCore.Functions.Notify(lang:t('no_pd'), "error", 5000)
 	else
 		local Prodej = {
 			{
@@ -102,11 +118,15 @@ RegisterNetEvent('qb-saler:client:target:prodej', function (akce, SalerPed, need
 			icon = "fa-solid fa-wrench",
 			txt = v.description,
 			params = {
-				event = "qb-saler:client:target:Sell",
+				event = "k1987-saler:client:target:Sell",
 				args = {
 					item = v.ItemName,
 					cena = v.Price,
-					SalerPed = SalerPed
+					markedbills = markedbills,
+					stableprice = stableprice,
+					minprice = v.MinPrice,
+					maxprice = v.MaxPrice,
+					illegal = illegal
 				}
 			}	
 		}
@@ -125,23 +145,22 @@ end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     deletePeds()
+	PlayerData = nil
 end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-	QBCore.Functions.GetPlayerData(function(PlayerData)
-		PlayerJob = PlayerData.job
-	end)
+	PlayerData = QBCore.Functions.GetPlayerData()
 	createPeds()
 end)
 
 AddEventHandler('onResourceStart', function(resourceName)
-	if GetCurrentResourceName() == resourceName then
-		createPeds()
-	end
+	if GetCurrentResourceName() ~= resourceName then return end
+
+	createPeds()
 end)
 
 AddEventHandler('onResourceStop', function(resourceName)
-	if GetCurrentResourceName() == resourceName then
-		deletePeds()
-	end
+	if GetCurrentResourceName() ~= resourceName then return end
+
+	deletePeds()
 end)
