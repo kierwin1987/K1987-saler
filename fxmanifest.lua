@@ -1,7 +1,7 @@
 fx_version 'cerulean'
 game 'gta5'
 
-description 'QB-Saler'
+description 'K1987-Saler'
 version '1.0.0'
 author 'Kierwin1987' --https://github.com/kierwin1987/qb-saler
 
