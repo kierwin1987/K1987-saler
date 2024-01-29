@@ -3,7 +3,7 @@ game 'gta5'
 
 description 'K1987-Saler'
 version '1.0.0'
-author 'Kierwin1987' --https://github.com/kierwin1987/qb-saler
+author 'Kierwin1987' --https://github.com/kierwin1987
 
 shared_scripts {
     '@qb-core/shared/locale.lua',
